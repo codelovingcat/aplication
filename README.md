@@ -7,7 +7,7 @@ Bu repository, geliştirilen uygulama ve ilgili dosyaları barındırır.
 - `ritm` — proje dosyaları / uygulama bileşenleri
 - `fake.json` — geliştirme ve test amacıyla kullanılan örnek veri
 
-## 🚀 Geliştirme
+## 🚀 Geliştirme yeni ekleme işlemi
 
 Repository üzerindeki dosyalar geliştirme sürecinde güncellenebilir. Test verileri ve geçici dosyalar gerektiğinde ayrıca düzenlenebilir.
 
