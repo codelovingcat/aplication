@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..AtsCv.ApplicationAtsCv.Application.csproj" />
-    <ProjectReference Include="..AtsCv.DomainAtsCv.Domain.csproj" />
+    <ProjectReference Include="..\AtsCv.Application\AtsCv.Application.csproj" />
+    <ProjectReference Include="..\AtsCv.Domain\AtsCv.Domain.csproj" />
   </ItemGroup>
 </Project>
