@@ -2,5 +2,6 @@
   <ItemGroup>
     <ProjectReference Include="..\AtsCv.Application\AtsCv.Application.csproj" />
     <ProjectReference Include="..\AtsCv.Infrastructure\AtsCv.Infrastructure.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 </Project>
