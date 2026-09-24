@@ -18,6 +18,10 @@ public sealed class CandidateProfile
     public string FullName { get; private set; }
     public string? Email { get; private set; }
     public string? Phone { get; private set; }
+    public string? Summary { get; private set; }
+    public IReadOnlyCollection<string> Skills { get; private set; } = Array.Empty<string>();
+    public IReadOnlyCollection<string> Languages { get; private set; } = Array.Empty<string>();
+    public IReadOnlyCollection<string> Certifications { get; private set; } = Array.Empty<string>();
 
     // Free-form information supplied by the candidate.
     // This is treated as candidate-provided source data for later AI workflows.
@@ -49,6 +53,27 @@ public sealed class CandidateProfile
         AdditionalInformation = Normalize(additionalInformation);
     }
 
+    public void UpdateProfessionalDetails(
+        string? summary,
+        IEnumerable<string>? skills,
+        IEnumerable<string>? languages,
+        IEnumerable<string>? certifications)
+    {
+        Summary = Normalize(summary);
+        Skills = NormalizeCollection(skills);
+        Languages = NormalizeCollection(languages);
+        Certifications = NormalizeCollection(certifications);
+    }
+
     private static string? Normalize(string? value) =>
         string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    private static IReadOnlyCollection<string> NormalizeCollection(IEnumerable<string>? values) =>
+        values is null
+            ? Array.Empty<string>()
+            : values
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .Select(value => value.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
 }
