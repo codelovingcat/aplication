@@ -2,5 +2,6 @@
   <ItemGroup>
     <ProjectReference Include="..\AtsCv.Application\AtsCv.Application.csproj" />
     <ProjectReference Include="..\AtsCv.Domain\AtsCv.Domain.csproj" />
+    <PackageReference Include="PdfPig" Version="0.1.7" />
   </ItemGroup>
 </Project>
