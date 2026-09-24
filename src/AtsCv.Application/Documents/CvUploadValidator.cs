@@ -5,6 +5,7 @@ namespace AtsCv.Application.Documents;
 public sealed class CvUploadValidator
 {
     public const long DefaultMaxFileSizeBytes = 10 * 1024 * 1024;
+    public const int DefaultMaxAdditionalInformationLength = 2000;
 
     private static readonly IReadOnlyDictionary<DocumentType, string[]> AllowedExtensions = new Dictionary<DocumentType, string[]>
     {
@@ -19,13 +20,20 @@ public sealed class CvUploadValidator
     };
 
     private readonly long _maxFileSizeBytes;
+    private readonly int _maxAdditionalInformationLength;
 
-    public CvUploadValidator(long maxFileSizeBytes = DefaultMaxFileSizeBytes)
+    public CvUploadValidator(
+        long maxFileSizeBytes = DefaultMaxFileSizeBytes,
+        int maxAdditionalInformationLength = DefaultMaxAdditionalInformationLength)
     {
         if (maxFileSizeBytes <= 0)
             throw new ArgumentOutOfRangeException(nameof(maxFileSizeBytes));
 
+        if (maxAdditionalInformationLength <= 0)
+            throw new ArgumentOutOfRangeException(nameof(maxAdditionalInformationLength));
+
         _maxFileSizeBytes = maxFileSizeBytes;
+        _maxAdditionalInformationLength = maxAdditionalInformationLength;
     }
 
     public CvUploadValidationResult Validate(ResumeUploadRequest request)
@@ -62,6 +70,12 @@ public sealed class CvUploadValidator
             !contentTypes.Contains(request.ContentType, StringComparer.OrdinalIgnoreCase))
         {
             errors.Add("The content type does not match the selected document type.");
+        }
+
+        if (request.AdditionalInformation is { Length: var length } && length > _maxAdditionalInformationLength)
+        {
+            errors.Add(
+                $"Additional information must not exceed {_maxAdditionalInformationLength} characters.");
         }
 
         if (request.Content is null || !request.Content.CanRead)
