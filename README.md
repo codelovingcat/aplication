@@ -2,7 +2,7 @@
 
 Bu repository, geliştirilen uygulama ve ilgili dosyaları barındırır.
 
-## 📁 Proje Yapısı
+## 📁 Proje Yapısı 0000002222
 
 - `ritm` — proje dosyaları / uygulama bileşenleri
 - `fake.json` — geliştirme ve test amacıyla kullanılan örnek veri
