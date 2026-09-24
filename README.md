@@ -15,6 +15,7 @@ Uygulama iki ana kullanım senaryosuna dayanır.
 Kullanıcı mevcut CV'sini sisteme yükler.
 
 Desteklenen temel dosya türleri:
+Ayrıca bu uygulama ön yazı da hazırlamaktadır.
 
 - PDF
 - DOCX / Word
