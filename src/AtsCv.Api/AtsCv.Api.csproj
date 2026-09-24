@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..AtsCv.ApplicationAtsCv.Application.csproj" />
+    <ProjectReference Include="..AtsCv.InfrastructureAtsCv.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
