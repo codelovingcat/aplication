@@ -72,7 +72,7 @@ public sealed class CvUploadValidator
             errors.Add("The content type does not match the selected document type.");
         }
 
-        if (request.AdditionalInformation is { Length: > DefaultMaxAdditionalInformationLength })
+        if (request.AdditionalInformation is { Length: var length } && length > _maxAdditionalInformationLength)
         {
             errors.Add(
                 $"Additional information must not exceed {_maxAdditionalInformationLength} characters.");
