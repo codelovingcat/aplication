@@ -43,8 +43,11 @@ builder.Services.AddRateLimiter(options =>
         };
         problem.Extensions["errorCode"] = ApiErrorCode.RateLimited;
 
+        // The overload that accepts a content type requires the serializer options,
+        // so they are passed explicitly to keep the problem+json content type.
         await httpContext.Response.WriteAsJsonAsync(
             problem,
+            options: null,
             contentType: "application/problem+json",
             cancellationToken: cancellationToken);
     };
@@ -122,7 +125,7 @@ app.MapPost(
                 await using var content = file.OpenReadStream();
                 var result = await intakeService.IntakeAsync(
                     new ResumeUploadRequest(
-                        file.FileName,
+                        uploadedFileName,
                         file.ContentType,
                         documentType.Value,
                         content,

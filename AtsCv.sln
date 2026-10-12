@@ -10,6 +10,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtsCv.Domain", "src\AtsCv.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtsCv.Infrastructure", "src\AtsCv.Infrastructure\AtsCv.Infrastructure.csproj", "{35F3B281-1D72-4F2D-93AA-5B5D2C8D4F61}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtsCv.Application.Tests", "tests\AtsCv.Application.Tests\AtsCv.Application.Tests.csproj", "{4F1E9C3A-8B27-4D2E-9A61-7C5B0D3E6F42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtsCv.Api.Tests", "tests\AtsCv.Api.Tests\AtsCv.Api.Tests.csproj", "{7A2D5E91-3C64-4B18-8D27-1F9E6A4C0B53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +36,14 @@ Global
 		{35F3B281-1D72-4F2D-93AA-5B5D2C8D4F61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35F3B281-1D72-4F2D-93AA-5B5D2C8D4F61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35F3B281-1D72-4F2D-93AA-5B5D2C8D4F61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F1E9C3A-8B27-4D2E-9A61-7C5B0D3E6F42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F1E9C3A-8B27-4D2E-9A61-7C5B0D3E6F42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F1E9C3A-8B27-4D2E-9A61-7C5B0D3E6F42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F1E9C3A-8B27-4D2E-9A61-7C5B0D3E6F42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A2D5E91-3C64-4B18-8D27-1F9E6A4C0B53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A2D5E91-3C64-4B18-8D27-1F9E6A4C0B53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A2D5E91-3C64-4B18-8D27-1F9E6A4C0B53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A2D5E91-3C64-4B18-8D27-1F9E6A4C0B53}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
