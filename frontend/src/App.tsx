@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import CvDropzone from "./components/CvDropzone";
 import { uploadCv } from "./services/cvIntakeClient";
@@ -10,7 +10,7 @@ function Brand() {
   return <Link className="brand" to="/" aria-label="ATS CV ana sayfa"><span className="brand-mark">CV</span><span>ats<span className="brand-accent">.</span>cv</span></Link>;
 }
 
-function Shell({ children }: { children: React.ReactNode }) {
+function Shell({ children }: { children: ReactNode }) {
   return <div className="app-shell"><header className="topbar"><Brand /><span className="topbar-note">Kariyerinin bir sonraki adımı</span></header>{children}<footer className="footer"><span>ATS CV · Başvuruna sağlam bir başlangıç</span><span>Dosyaların yalnızca CV işleme isteği için gönderilir.</span></footer></div>;
 }
 
