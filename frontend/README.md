@@ -32,4 +32,8 @@ npm run build
 - Retry after recoverable errors without refreshing the page
 - Success route after the API confirms extraction and creates draft IDs
 
-The current API endpoint returns extracted CV text. ATS scoring/analysis is not yet connected; the success screen explicitly identifies that follow-up instead of inventing a score. The API currently returns extracted text in its response; review API response handling and data-retention policy before exposing this service to production users.
+After upload, the frontend requests `POST /api/cv/{resumeId}/analyze` and renders the persisted analysis response. The findings page includes the heuristic score, strengths, issues, recommendations, section findings, and keyword findings, plus loading, safe error, retry, and empty states. The score is not a hiring probability.
+
+## Test and build
+
+Run `npm ci`, `npm run build`, and `npm test` from this directory.

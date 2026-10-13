@@ -107,3 +107,21 @@ textarea:disabled{background:#f4f6f3}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:600px){.topbar{height:64px;padding:0 20px}.topbar-note{font-size:10px}.main-content{width:min(100% - 28px,660px);margin:36px auto 44px}h1{font-size:35px;letter-spacing:-1.4px}.intro{font-size:13px}.stepper{gap:7px}.step{gap:6px}.step strong{font-size:10px}.step small{font-size:9px}.step>span{width:25px;height:25px;flex-basis:25px}.upload-card,.result-card{padding:20px 16px 18px}.trust-row{grid-template-columns:1fr;gap:8px}.trust-row>div{padding:10px 12px}.footer{padding:16px 20px;flex-direction:column;gap:7px;font-size:9px}.selected-file{flex-wrap:wrap}.file-details{flex-basis:calc(100% - 60px)}.id-grid{grid-template-columns:1fr}.field-heading{align-items:flex-start;flex-direction:column;gap:5px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+.analysis-loading{min-height:74px}
+.analysis-card{margin-top:22px}
+.score-panel{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:19px 0;padding:22px 24px;border:1px solid #dce8dc;border-radius:14px;background:#f7fbf6}
+.score-copy{min-width:0}
+.score-copy h2{margin:8px 0 6px;font:700 18px Manrope,sans-serif;color:#214a3e}
+.score-copy p{margin:0;color:#75857b;font-size:11px;line-height:1.7;max-width:390px}
+.analysis-score{display:flex;align-items:baseline;gap:4px;flex:0 0 auto;color:#174d43}
+.analysis-score strong{font:800 42px/1 Manrope,sans-serif;letter-spacing:-1.5px}
+.analysis-score span{font-size:11px;color:#7d8d82}
+.findings-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:18px 0 22px}
+.findings-section{min-width:0;padding:18px 17px;border:1px solid #e2e9e2;border-radius:12px;background:rgba(255,255,255,.82)}
+.findings-section h2{margin:0 0 12px;color:#25483e;font:700 13px/1.35 Manrope,sans-serif}
+.findings-list{margin:0;padding-left:17px;display:grid;gap:9px}
+.findings-list li{color:#5e7067;font-size:11px;line-height:1.65;overflow-wrap:anywhere;padding-left:2px}
+.empty-findings{margin:0;color:#8a978e;font-size:11px;line-height:1.65}
+.retry-button{margin-top:9px}
+.back-button{margin-top:19px}
+@media(max-width:600px){.score-panel{align-items:flex-start;padding:18px 16px;gap:12px}.analysis-score strong{font-size:34px}.findings-grid{grid-template-columns:1fr;gap:10px}.findings-section{padding:16px}}
