@@ -4,6 +4,7 @@ using AtsCv.Application.AI;
 using AtsCv.Api.Errors;
 using AtsCv.Application.Documents;
 using AtsCv.Application.Persistence;
+using AtsCv.Domain.Resumes;
 using AtsCv.Application.Resumes;
 using AtsCv.Infrastructure.Documents;
 using AtsCv.Infrastructure.Persistence;
