@@ -22,14 +22,6 @@ function validateFile(file: File): void {
   }
 }
 
-async function readProblem(response: Response): Promise<ProblemDetails> {
-  try {
-    return (await response.json()) as ProblemDetails;
-  } catch {
-    return {};
-  }
-}
-
 function mapProblem(response: Response, problem: ProblemDetails): UploadError {
   const code = problem.errorCode ?? "";
   if (response.status === 413 || code === "file_too_large") {
