@@ -50,6 +50,12 @@ export function uploadCv(
   signal: AbortSignal,
   onProgress: (percent: number) => void
 ): Promise<UploadSuccess> {
+  // An already-aborted signal will not fire a new "abort" event when we
+  // attach a listener, so stop before creating or sending the request.
+  if (signal.aborted) {
+    return Promise.reject(new DOMException("Yükleme iptal edildi.", "AbortError"));
+  }
+
   validateFile(file);
   if (additionalInformation.length > MAX_ADDITIONAL_INFORMATION) {
     throw new UploadError("Ek bilgi en fazla 2.000 karakter olabilir.", "validation");
