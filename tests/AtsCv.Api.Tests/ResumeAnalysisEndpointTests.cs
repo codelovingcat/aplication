@@ -4,6 +4,7 @@ using AtsCv.Domain.Candidates;
 using AtsCv.Domain.Resumes;
 using AtsCv.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace AtsCv.Api.Tests;
