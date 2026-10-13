@@ -60,7 +60,7 @@ export default function CvDropzone({ file, disabled, error, onFileChange }: Prop
       {file ? (
         <div className="selected-file">
           <div className="file-icon" aria-hidden="true">{file.name.toLowerCase().endsWith(".pdf") ? "PDF" : "DOCX"}</div>
-          <div className="file-details">
+          <div className="file-details" role="status" aria-live="polite">
             <strong title={file.name}>{file.name}</strong>
             <span>{formatBytes(file.size)} · Yüklemeye hazır</span>
           </div>
