@@ -225,4 +225,75 @@ app.MapPost(
     .DisableAntiforgery()
     .RequireRateLimiting("upload");
 
+app.MapPost(
+        "/api/cv/{resumeId:guid}/analyze",
+        async (
+            Guid resumeId,
+            IResumeRepository resumeRepository,
+            IUnitOfWork unitOfWork,
+            AtsResumeAnalysisService analysisService,
+            HttpContext httpContext,
+            ILogger<Program> logger,
+            CancellationToken cancellationToken) =>
+        {
+            var resume = await resumeRepository.GetByIdAsync(resumeId, cancellationToken);
+            if (resume is null)
+            {
+                return ApiProblem.Create(
+                    httpContext,
+                    StatusCodes.Status404NotFound,
+                    "Resume not found",
+                    "No saved CV was found for the supplied resume ID.",
+                    ApiErrorCode.ResumeNotFound);
+            }
+
+            if (resume.Status is not (ResumeStatus.TextExtracted or ResumeStatus.Analyzed) ||
+                string.IsNullOrWhiteSpace(resume.ExtractedText))
+            {
+                return ApiProblem.Create(
+                    httpContext,
+                    StatusCodes.Status409Conflict,
+                    "Resume is not ready for analysis",
+                    "The CV must finish text extraction before ATS analysis can run.",
+                    ApiErrorCode.ResumeNotReady);
+            }
+
+            try
+            {
+                var analysis = await analysisService.AnalyzeAsync(resume, cancellationToken);
+                resumeRepository.Update(resume);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok(new ResumeAnalysisResponse(
+                    resume.Id,
+                    resume.Status.ToString(),
+                    analysis.Score,
+                    analysis.Strengths,
+                    analysis.Issues,
+                    analysis.Recommendations,
+                    analysis.SectionFindings,
+                    analysis.KeywordFindings));
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "Unexpected error while analyzing a saved CV.");
+
+                return ApiProblem.Create(
+                    httpContext,
+                    StatusCodes.Status500InternalServerError,
+                    "CV analysis failed",
+                    "The CV could not be analyzed. Please try again later.",
+                    ApiErrorCode.Unexpected);
+            }
+        })
+    .WithName("AnalyzeCv")
+    .Produces<ResumeAnalysisResponse>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .ProducesProblem(StatusCodes.Status409Conflict)
+    .ProducesProblem(StatusCodes.Status500InternalServerError);
+
 app.Run();
