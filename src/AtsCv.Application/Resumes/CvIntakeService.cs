@@ -1,4 +1,5 @@
 using AtsCv.Application.Documents;
+using AtsCv.Application.Persistence;
 using AtsCv.Domain.Candidates;
 using AtsCv.Domain.Resumes;
 
@@ -13,19 +14,31 @@ public sealed class CvIntakeService
     private readonly CvUploadValidator _uploadValidator;
     private readonly CvFileSignatureValidator _signatureValidator;
     private readonly IReadOnlyCollection<ICvTextExtractor> _textExtractors;
+    private readonly ICandidateProfileRepository _candidateProfileRepository;
+    private readonly IResumeRepository _resumeRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CvIntakeService(
         CvUploadValidator uploadValidator,
         CvFileSignatureValidator signatureValidator,
-        IEnumerable<ICvTextExtractor> textExtractors)
+        IEnumerable<ICvTextExtractor> textExtractors,
+        ICandidateProfileRepository candidateProfileRepository,
+        IResumeRepository resumeRepository,
+        IUnitOfWork unitOfWork)
     {
         ArgumentNullException.ThrowIfNull(uploadValidator);
         ArgumentNullException.ThrowIfNull(signatureValidator);
         ArgumentNullException.ThrowIfNull(textExtractors);
+        ArgumentNullException.ThrowIfNull(candidateProfileRepository);
+        ArgumentNullException.ThrowIfNull(resumeRepository);
+        ArgumentNullException.ThrowIfNull(unitOfWork);
 
         _uploadValidator = uploadValidator;
         _signatureValidator = signatureValidator;
         _textExtractors = textExtractors.ToArray();
+        _candidateProfileRepository = candidateProfileRepository;
+        _resumeRepository = resumeRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<CvIntakeResult> IntakeAsync(
@@ -75,6 +88,12 @@ public sealed class CvIntakeService
             throw new CvTextExtractionException();
 
         resume.SetExtractedText(extractedText);
+
+        // The two related drafts are committed through one unit of work so a
+        // successful upload never returns identifiers for unsaved entities.
+        _candidateProfileRepository.Add(candidateProfile);
+        _resumeRepository.Add(resume);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new CvIntakeResult(
             resume.Id,
