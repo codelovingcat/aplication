@@ -3,8 +3,11 @@ using AtsCv.Api.Contracts;
 using AtsCv.Application.AI;
 using AtsCv.Api.Errors;
 using AtsCv.Application.Documents;
+using AtsCv.Application.Persistence;
 using AtsCv.Application.Resumes;
 using AtsCv.Infrastructure.Documents;
+using AtsCv.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -16,6 +19,12 @@ builder.Services.AddProblemDetails();
 
 builder.Services.AddSingleton<IAtsResumeAnalyzer, ExplainableAtsResumeAnalyzer>();
 builder.Services.AddScoped<AtsResumeAnalysisService>();
+builder.Services.AddDbContext<AtsCvDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("AtsCv")
+        ?? "Data Source=atscv.db"));
+builder.Services.AddScoped<IResumeRepository, EfResumeRepository>();
+builder.Services.AddScoped<ICandidateProfileRepository, EfCandidateProfileRepository>();
+builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 builder.Services.AddSingleton(new CvUploadValidator());
 builder.Services.AddSingleton<CvFileSignatureValidator>();
 builder.Services.AddSingleton<ICvTextExtractor, PdfCvTextExtractor>();
@@ -57,6 +66,13 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+
+// Apply versioned persistence migrations at startup before accepting requests.
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AtsCvDbContext>();
+    dbContext.Database.Migrate();
+}
 
 app.UseRateLimiter();
 
