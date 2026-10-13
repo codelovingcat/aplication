@@ -237,30 +237,30 @@ app.MapPost(
             ILogger<Program> logger,
             CancellationToken cancellationToken) =>
         {
-            var resume = await resumeRepository.GetByIdAsync(resumeId, cancellationToken);
-            if (resume is null)
-            {
-                return ApiProblem.Create(
-                    httpContext,
-                    StatusCodes.Status404NotFound,
-                    "Resume not found",
-                    "No saved CV was found for the supplied resume ID.",
-                    ApiErrorCode.ResumeNotFound);
-            }
-
-            if (resume.Status is not (ResumeStatus.TextExtracted or ResumeStatus.Analyzed) ||
-                string.IsNullOrWhiteSpace(resume.ExtractedText))
-            {
-                return ApiProblem.Create(
-                    httpContext,
-                    StatusCodes.Status409Conflict,
-                    "Resume is not ready for analysis",
-                    "The CV must finish text extraction before ATS analysis can run.",
-                    ApiErrorCode.ResumeNotReady);
-            }
-
             try
             {
+                var resume = await resumeRepository.GetByIdAsync(resumeId, cancellationToken);
+                if (resume is null)
+                {
+                    return ApiProblem.Create(
+                        httpContext,
+                        StatusCodes.Status404NotFound,
+                        "Resume not found",
+                        "No saved CV was found for the supplied resume ID.",
+                        ApiErrorCode.ResumeNotFound);
+                }
+
+                if (resume.Status is not (ResumeStatus.TextExtracted or ResumeStatus.Analyzed) ||
+                    string.IsNullOrWhiteSpace(resume.ExtractedText))
+                {
+                    return ApiProblem.Create(
+                        httpContext,
+                        StatusCodes.Status409Conflict,
+                        "Resume is not ready for analysis",
+                        "The CV must finish text extraction before ATS analysis can run.",
+                        ApiErrorCode.ResumeNotReady);
+                }
+
                 var analysis = await analysisService.AnalyzeAsync(resume, cancellationToken);
                 resumeRepository.Update(resume);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
