@@ -1,5 +1,6 @@
 using System.Threading.RateLimiting;
 using AtsCv.Api.Contracts;
+using AtsCv.Application.AI;
 using AtsCv.Api.Errors;
 using AtsCv.Application.Documents;
 using AtsCv.Application.Resumes;
@@ -13,6 +14,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddProblemDetails();
 
+builder.Services.AddSingleton<IAtsResumeAnalyzer, ExplainableAtsResumeAnalyzer>();
+builder.Services.AddScoped<AtsResumeAnalysisService>();
 builder.Services.AddSingleton(new CvUploadValidator());
 builder.Services.AddSingleton<CvFileSignatureValidator>();
 builder.Services.AddSingleton<ICvTextExtractor, PdfCvTextExtractor>();
