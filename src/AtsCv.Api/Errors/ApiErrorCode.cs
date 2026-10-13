@@ -8,4 +8,6 @@ public static class ApiErrorCode
     public const string ExtractionFailed = "extraction_failed";
     public const string RateLimited = "rate_limited";
     public const string Unexpected = "unexpected_error";
+    public const string ResumeNotFound = "resume_not_found";
+    public const string ResumeNotReady = "resume_not_ready";
 }

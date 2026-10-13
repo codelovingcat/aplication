@@ -1,5 +1,7 @@
 using AtsCv.Application.Documents;
+using AtsCv.Application.Persistence;
 using AtsCv.Application.Resumes;
+using AtsCv.Domain.Resumes;
 using Xunit;
 
 namespace AtsCv.Application.Tests;
@@ -12,7 +14,10 @@ public sealed class CvIntakeServiceTests
         new(
             new CvUploadValidator(maxFileSizeBytes),
             new CvFileSignatureValidator(),
-            new[] { extractor });
+            new[] { extractor },
+            new InMemoryCandidateProfileRepository(),
+            new InMemoryResumeRepository(),
+            new InMemoryUnitOfWork());
 
     [Fact]
     public async Task IntakeAsync_WithNullRequest_Throws()
@@ -126,4 +131,32 @@ public sealed class CvIntakeServiceTests
         Assert.Equal(1, extractor.CallCount);
         Assert.Equal(0, extractor.StreamPositionAtCall);
     }
+
+    [Fact]
+    public async Task IntakeAsync_WithValidUpload_PersistsRelatedDraftsWithOneSave()
+    {
+        var extractor = new RecordingCvTextExtractor(extractedText: "Extracted CV body.");
+        var candidates = new InMemoryCandidateProfileRepository();
+        var resumes = new InMemoryResumeRepository();
+        var unitOfWork = new InMemoryUnitOfWork();
+        var service = new CvIntakeService(
+            new CvUploadValidator(),
+            new CvFileSignatureValidator(),
+            new[] { extractor },
+            candidates,
+            resumes,
+            unitOfWork);
+
+        var result = await service.IntakeAsync(CvTestData.ValidPdfRequest());
+
+        var candidate = Assert.Single(candidates.All);
+        var resume = Assert.Single(resumes.All);
+        Assert.Equal(result.CandidateProfileId, candidate.Id);
+        Assert.Equal(result.ResumeId, resume.Id);
+        Assert.Equal(candidate.Id, resume.CandidateProfileId);
+        Assert.Equal("Extracted CV body.", resume.ExtractedText);
+        Assert.Equal(ResumeStatus.TextExtracted, resume.Status);
+        Assert.Equal(1, unitOfWork.SaveCount);
+    }
+
 }
