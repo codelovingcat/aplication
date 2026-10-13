@@ -1,6 +1,7 @@
 using AtsCv.Application.Documents;
 using AtsCv.Application.Persistence;
 using AtsCv.Application.Resumes;
+using AtsCv.Domain.Resumes;
 using Xunit;
 
 namespace AtsCv.Application.Tests;
@@ -130,6 +131,7 @@ public sealed class CvIntakeServiceTests
         Assert.Equal(1, extractor.CallCount);
         Assert.Equal(0, extractor.StreamPositionAtCall);
     }
+
     [Fact]
     public async Task IntakeAsync_WithValidUpload_PersistsRelatedDraftsWithOneSave()
     {
