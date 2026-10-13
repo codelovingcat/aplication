@@ -1,6 +1,5 @@
 using System.Net;
 using System.Text.Json;
-using AtsCv.Application.AI;
 using AtsCv.Domain.Candidates;
 using AtsCv.Domain.Resumes;
 using AtsCv.Infrastructure.Persistence;
