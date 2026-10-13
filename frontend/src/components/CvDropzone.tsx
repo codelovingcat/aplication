@@ -29,7 +29,12 @@ export default function CvDropzone({ file, disabled, error, onFileChange }: Prop
     if (!candidate) return;
     const issue = validate(candidate);
     setLocalError(issue);
-    if (!issue) onFileChange(candidate);
+    if (issue) {
+      // Do not leave an earlier valid file selected after a replacement fails.
+      onFileChange(null);
+      return;
+    }
+    onFileChange(candidate);
   }
 
   function onInputChange(event: ChangeEvent<HTMLInputElement>) {
