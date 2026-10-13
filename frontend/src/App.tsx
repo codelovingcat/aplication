@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "rea
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import CvDropzone from "./components/CvDropzone";
 import { uploadCv } from "./services/cvIntakeClient";
+import { analyzeResume } from "./services/analysisClient";
+import { AnalysisError, type ResumeAnalysisResponse } from "./types/analysis";
 import { MAX_ADDITIONAL_INFORMATION, type UploadSuccess, UploadError } from "./types/intake";
 
 type Phase = "idle" | "uploading" | "processing" | "success" | "error";
@@ -84,7 +86,7 @@ function UploadPage() {
 
         {busy && <div className="progress-panel" aria-live="polite">
           <div className="progress-copy"><span className="spinner" aria-hidden="true" /><div><strong>{phase === "uploading" ? "CV yükleniyor..." : "CV işleniyor..."}</strong><span>{phase === "uploading" ? "Dosyan güvenli şekilde gönderiliyor." : "Sunucu dosyanın içeriğini kontrol ediyor ve metni çıkarıyor."}</span></div><b>{progress}%</b></div>
-          <div className="progress-track" role="progressbar" aria-label="Dosya yükleme ilerlemesi" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><span style={{ width: \`\${progress}%\` }} /></div>
+          <div className="progress-track" role="progressbar" aria-label="Dosya yükleme ilerlemesi" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><span style={{ width: `${progress}%` }} /></div>
           <button type="button" className="text-button cancel-button" onClick={() => abortRef.current?.abort()}>Yüklemeyi iptal et</button>
         </div>}
 
@@ -101,19 +103,97 @@ function UploadPage() {
   </Shell>;
 }
 
+type FindingGroupProps = {
+  heading: string;
+  items: string[];
+  emptyMessage: string;
+};
+
+function FindingGroup({ heading, items, emptyMessage }: FindingGroupProps) {
+  const headingId = "heading-" + heading.replace(/\s+/g, "-").toLowerCase();
+
+  return <section className="findings-section" aria-labelledby={headingId}>
+    <h2 id={headingId}>{heading}</h2>
+    {items.length > 0
+      ? <ul className="findings-list">{items.map((item, index) => <li key={heading + "-" + index}>{item}</li>)}</ul>
+      : <p className="empty-findings">{emptyMessage}</p>}
+  </section>;
+}
+
 function AnalysisPage() {
   const location = useLocation();
   const result = (location.state as { result?: UploadSuccess } | null)?.result;
+  const [analysis, setAnalysis] = useState<ResumeAnalysisResponse | null>(null);
+  const [phase, setPhase] = useState<"loading" | "success" | "error">("loading");
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+
+  useEffect(() => {
+    if (!result?.resumeId) return;
+    const controller = new AbortController();
+    setPhase("loading");
+    setAnalysis(null);
+    setError(null);
+
+    analyzeResume(result.resumeId, controller.signal)
+      .then(response => {
+        if (controller.signal.aborted) return;
+        setAnalysis(response);
+        setPhase("success");
+      })
+      .catch(cause => {
+        if (controller.signal.aborted || (cause instanceof DOMException && cause.name === "AbortError")) return;
+        setError(cause instanceof AnalysisError
+          ? cause.message
+          : "CV şu anda analiz edilemedi. Lütfen biraz sonra yeniden dene.");
+        setPhase("error");
+      });
+
+    return () => controller.abort();
+  }, [result?.resumeId, retryCount]);
+
   if (!result) return <Navigate to="/" replace />;
 
   return <Shell><main className="main-content result-content">
-    <div className="success-icon" aria-hidden="true">✓</div>
-    <div className="eyebrow"><span className="eyebrow-dot" /> İLK ADIM TAMAMLANDI</div>
-    <h1>CV dosyan alındı.<br /><span>Buradan devam edeceğiz.</span></h1>
-    <p className="intro">Dosyan başarıyla okundu ve metin çıkarıldı. ATS analizi bu sürümde henüz bağlanmadı; bu nedenle sonuç veya puan uydurmuyoruz.</p>
-    <section className="result-card"><span className="section-kicker">YÜKLENEN DOSYA</span><h2>{result.fileName}</h2><div className="result-meta"><span>✓ Metin çıkarıldı</span><span>✓ CV taslağı oluşturuldu</span></div><div className="id-grid"><div><small>CV taslak kimliği</small><code>{result.resumeId}</code></div><div><small>Aday profili kimliği</small><code>{result.candidateProfileId}</code></div></div></section>
-    <div className="next-step"><span className="next-number">02</span><div><strong>Sıradaki adım: ATS analizi</strong><p>Bir sonraki geliştirmede başlıklar, beceriler, anahtar kelimeler ve okunabilirlik incelenecek.</p></div></div>
-    <Link className="primary-button link-button" to="/">Başka bir CV yükle <span aria-hidden="true">→</span></Link>
+    <div className="eyebrow"><span className="eyebrow-dot" /> ATS ANALİZİ</div>
+    <h1>CV'ni daha yakından<br /><span>tanıyalım.</span></h1>
+    <p className="intro">Bu değerlendirme, kaydedilmiş CV metnindeki gözlemlenebilir sinyalleri açıklar. Puan bir işe alınma olasılığı değildir ve işe alım sonucunu tahmin etmez.</p>
+
+    <section className="result-card analysis-card" aria-labelledby="uploaded-file-heading">
+      <span className="section-kicker">İNCELENEN DOSYA</span>
+      <h2 id="uploaded-file-heading">{result.fileName}</h2>
+      <div className="result-meta"><span>✓ Metin çıkarıldı</span><span>✓ CV taslağı kaydedildi</span></div>
+      <div className="id-grid">
+        <div><small>CV taslak kimliği</small><code>{result.resumeId}</code></div>
+        <div><small>Aday profili kimliği</small><code>{result.candidateProfileId}</code></div>
+      </div>
+    </section>
+
+    {phase === "loading" && <div className="progress-panel analysis-loading" role="status" aria-live="polite">
+      <div className="progress-copy"><span className="spinner" aria-hidden="true" /><div><strong>CV analiz ediliyor...</strong><span>Bölümler, iletişim bilgileri, metin kalitesi ve genel anahtar kelime sinyalleri inceleniyor.</span></div></div>
+    </div>}
+
+    {phase === "error" && <div className="alert alert--error" role="alert">
+      <span aria-hidden="true">!</span><div><strong>Analiz tamamlanamadı</strong><p>{error}</p>
+        <button className="secondary-button retry-button" type="button" onClick={() => setRetryCount(count => count + 1)}>Yeniden dene</button>
+      </div>
+    </div>}
+
+    {phase === "success" && analysis && <>
+      <section className="score-panel" aria-labelledby="score-heading">
+        <div className="score-copy"><span className="section-kicker">METİN TEMELLİ ATS OKUNABİLİRLİĞİ</span><h2 id="score-heading">Heuristik puanın</h2><p>Gözlemlenebilir metin kurallarından hesaplanır; iş tanımı eşleşmesi veya işe alınma ihtimali değildir.</p></div>
+        <div className="analysis-score" role="meter" aria-label="ATS okunabilirlik puanı" aria-valuemin={0} aria-valuemax={100} aria-valuenow={analysis.score}><strong>{analysis.score}</strong><span>/ 100</span></div>
+      </section>
+      <div className="findings-grid">
+        <FindingGroup heading="Güçlü yönler" items={analysis.strengths} emptyMessage="Metinde doğrulanabilir olumlu sinyal bulunamadı." />
+        <FindingGroup heading="Dikkat edilmesi gerekenler" items={analysis.issues} emptyMessage="Bu kurallar kapsamında belirgin bir sorun bulunmadı. Bu, tüm ATS risklerinin elendiği anlamına gelmez." />
+        <FindingGroup heading="Öneriler" items={analysis.recommendations} emptyMessage="Şu anda ek bir öneri yok." />
+        <FindingGroup heading="Bölüm bulguları" items={analysis.sectionFindings} emptyMessage="Bölüm bulgusu bulunamadı." />
+        <FindingGroup heading="Anahtar kelime bulguları" items={analysis.keywordFindings} emptyMessage="Anahtar kelime bulgusu bulunamadı." />
+      </div>
+    </>}
+
+    <Link className="primary-button link-button back-button" to="/">Yeni bir CV yükle <span aria-hidden="true">→</span></Link>
   </main></Shell>;
 }
 

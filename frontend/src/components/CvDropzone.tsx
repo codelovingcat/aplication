@@ -17,7 +17,7 @@ function validate(file: File): string | null {
 }
 
 function formatBytes(bytes: number): string {
-  return bytes < 1024 * 1024 ? \`\${(bytes / 1024).toFixed(0)} KB\` : \`\${(bytes / (1024 * 1024)).toFixed(1)} MB\`;
+  return bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(0)} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 export default function CvDropzone({ file, disabled, error, onFileChange }: Props) {
@@ -45,7 +45,7 @@ export default function CvDropzone({ file, disabled, error, onFileChange }: Prop
 
   return (
     <div
-      className={\`dropzone \${dragging ? "dropzone--active" : ""} \${file ? "dropzone--selected" : ""}\`}
+      className={`dropzone ${dragging ? "dropzone--active" : ""} ${file ? "dropzone--selected" : ""}`}
       onDragOver={(event) => { event.preventDefault(); if (!disabled) setDragging(true); }}
       onDragLeave={() => setDragging(false)}
       onDrop={onDrop}
