@@ -200,7 +200,7 @@ public sealed class CvUploadEndpointTests
         }
     }
 
-    private static WebApplicationFactory<ResumeUploadForm> CreateFactory() => new();
+    private static TestWebApplicationFactory CreateFactory() => new();
 
     private static MultipartFormDataContent CreateForm(
         byte[] content,
