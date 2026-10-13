@@ -1,4 +1,5 @@
 using AtsCv.Application.Documents;
+using AtsCv.Application.Persistence;
 using AtsCv.Application.Resumes;
 using Xunit;
 
@@ -12,7 +13,10 @@ public sealed class CvIntakeServiceTests
         new(
             new CvUploadValidator(maxFileSizeBytes),
             new CvFileSignatureValidator(),
-            new[] { extractor });
+            new[] { extractor },
+            new InMemoryCandidateProfileRepository(),
+            new InMemoryResumeRepository(),
+            new InMemoryUnitOfWork());
 
     [Fact]
     public async Task IntakeAsync_WithNullRequest_Throws()
